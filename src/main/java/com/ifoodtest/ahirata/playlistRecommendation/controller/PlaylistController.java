@@ -10,18 +10,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ifoodtest.ahirata.playlistRecommendation.model.Playlist;
+import com.ifoodtest.ahirata.playlistRecommendation.service.PlaylistRecommendationService;
+import com.ifoodtest.ahirata.playlistRecommendation.thirdparty.openweathermap.OpenWeatherMapService;
+import com.ifoodtest.ahirata.playlistRecommendation.thirdparty.spotify.SpotifyService;
+
 @RestController
 public class PlaylistController {
-    
+
+    PlaylistRecommendationService playlistReommendation = new PlaylistRecommendationService(new OpenWeatherMapService(),
+            new SpotifyService());
+
     @RequestMapping("/")
-    public ResponseEntity<String> getPlaylist(@RequestParam("city") Optional<String> cityName, @RequestParam("lat") Optional<Double> latitude,
-            @RequestParam("long") Optional<Double> longitude, HttpServletResponse response) {
+    public ResponseEntity<String> getPlaylist(@RequestParam("city") Optional<String> cityName,
+            @RequestParam("lat") Optional<Double> longitude, @RequestParam("long") Optional<Double> latitude,
+            HttpServletResponse response) {
         if (cityName.isPresent() && !cityName.get().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body("City: " + cityName.get());
-        }
-        else if (latitude.isPresent() && longitude.isPresent()) {
-            StringBuffer sb = new StringBuffer("Latitude: ").append(latitude.get()).append(", Longitude: ").append(longitude.get());
-            return ResponseEntity.status(HttpStatus.OK).body(sb.toString());
+            Playlist playlist = playlistReommendation.getPlaylist(cityName.get());
+            return ResponseEntity.status(HttpStatus.OK).body(playlist.toString());
+        } else if (longitude.isPresent() && latitude.isPresent()) {
+            Playlist playlist = playlistReommendation.getPlaylist(longitude.get(), latitude.get());
+            return ResponseEntity.status(HttpStatus.OK).body(playlist.toString());
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
