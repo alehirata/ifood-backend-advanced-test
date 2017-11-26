@@ -1,0 +1,4 @@
+party: Karaoke Party - https://open.spotify.com/user/spotify/playlist/37i9dQZF1DX2nwuHNKim4S
+pop music: Best of 2000s Pop - https://open.spotify.com/user/spotify/playlist/37i9dQZF1DWUaThf8nMdW6 
+rock: Rock Classics - https://open.spotify.com/user/spotify/playlist/37i9dQZF1DWXRqgorJj26U
+classical music: Classical Music for Smart Kids - https://open.spotify.com/user/spotify/playlist/37i9dQZF1DX8Sz1gsYZdwj

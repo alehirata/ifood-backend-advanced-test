@@ -33,3 +33,13 @@
 * It requires signing up even for free access.
 * At most one request each 10 minutes. So, I'm assuming the final solution would have a paid access to overcome such limitation. Anyway, for the sake of perfomance and since the weather is not likely to change so suddenly in a 10-minute period, it's reasonable to use a cache service to store weather data to avoid unnecessary API calls to this 3rd party service. 
 * Available API supports queries by citiy names and lat long coordinates and can return the temperature in Celsius (query param: units=metric). It supports responses in both JSON and XML.
+
+
+# Spotify Web API Overview
+
+* There's a simple HTTP GET request that returns the tracks of a given playlist: https://developer.spotify.com/web-api/get-playlists-tracks/. Besides, the information returned can be filtered, so we can ask just for track names and limit the number of items by using the query params: fields=items(track(name))&limit=10 
+* The responses are in JSON format.
+* Authentication is done through registered applications credential (https://developer.spotify.com/web-api/authorization-guide/). For simplicity, we can use the Client Credentials Flow.
+
+
+
