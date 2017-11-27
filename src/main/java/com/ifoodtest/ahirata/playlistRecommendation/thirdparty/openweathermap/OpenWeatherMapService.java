@@ -47,11 +47,11 @@ public class OpenWeatherMapService implements WeatherService {
     }
 
     public Weather getWeather(String city) throws Exception{
-        return callGetWeather(getWeatherUrl(city));
+        return requestWeather(getWeatherUrl(city));
     }
 
     public Weather getWeather(Double lon, Double lat) throws Exception {
-        return callGetWeather(getWeatherUrl(lon, lat));
+        return requestWeather(getWeatherUrl(lon, lat));
     }
 
     String getWeatherUrl(String city) {
@@ -77,7 +77,7 @@ public class OpenWeatherMapService implements WeatherService {
         return builder.build().toString();
     }
 
-    Weather callGetWeather(String url) throws Exception{
+    Weather requestWeather(String url) throws Exception{
         ResponseEntity<WeatherResponse> resp = restTemplate.getForEntity(url, WeatherResponse.class);
         
         if (resp.getStatusCode() == HttpStatus.OK) {
