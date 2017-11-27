@@ -41,14 +41,19 @@
 * The responses are in JSON format.
 * Authentication is done through registered applications credential (https://developer.spotify.com/web-api/authorization-guide/). For simplicity, we can use the Client Credentials Flow.
 
+# Assumptions
+
+1. Values for the temperatures: 30, 15 and 10 Celsius degrees are not well-defined. So, I'm assuming 30 = party music, 15 = pop music, and 10 = classical music.  
+2. Number of recommended tracks returned = 10 (at most)
+3. Playlist Ids were pre-defined
 
 # User Stories
 
 * As a user, I want to be recommended party tracks if the input city's temperature is in the interval [30, inf)
 * As a user, I want to be recommended pop music tracks if the input city's temperature is in the interval [15,30)
-* As a user, I want to be recommended rock music tracks if the input city's temperature is in the interval [10,14)
+* As a user, I want to be recommended rock music tracks if the input city's temperature is in the interval [10,15)
 * As a user, I want to be recommended classical music tracks if the input city's temperature is in the interval (-inf, 10)
 * As a user, I want to be recommended party tracks if the input (lat long coordinates)'s temperature is in the interval [30, inf)
 * As a user, I want to be recommended pop music tracks if the input (lat long coordinates)'s temperature is in the interval [15,30)
-* As a user, I want to be recommended rock music tracks if the input (lat long coordinates)'s temperature is in the interval [10,14)
+* As a user, I want to be recommended rock music tracks if the input (lat long coordinates)'s temperature is in the interval [10,15)
 * As a user, I want to be recommended classical music tracks if the input (lat long coordinates)'s temperature is in the interval (-inf, 10)

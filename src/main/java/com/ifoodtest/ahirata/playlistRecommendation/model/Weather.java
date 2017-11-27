@@ -1,7 +1,7 @@
 package com.ifoodtest.ahirata.playlistRecommendation.model;
 
 public enum Weather {
-    HOT(3), WARM(2), CHILLY(1), FREEZING(0);
+    HOT(3), WARM(2), CHILLY(1), FREEZING(0), UNKNOWN(-1);
 
     public final static double HOT_THREASHOLD = 30.0;
     public final static double WARM_THREASHOLD = 15.0;
@@ -14,13 +14,16 @@ public enum Weather {
     }
 
     public static Weather getWeather(Double temperature){
+        if (temperature == null) {
+            return Weather.UNKNOWN;
+        }
         if ( temperature >= HOT_THREASHOLD) {
             return Weather.HOT;
         }
-        else if ( temperature >= WARM_THREASHOLD) {
+        if ( temperature >= WARM_THREASHOLD) {
             return Weather.WARM;
         }
-        else if ( temperature >= CHILLY_THREASHOLD) {
+        if ( temperature >= CHILLY_THREASHOLD) {
             return Weather.CHILLY;
         }
         else {

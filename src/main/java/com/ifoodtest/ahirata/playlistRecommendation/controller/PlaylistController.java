@@ -25,12 +25,17 @@ public class PlaylistController {
     public ResponseEntity<String> getPlaylist(@RequestParam("city") Optional<String> cityName,
             @RequestParam("lat") Optional<Double> longitude, @RequestParam("long") Optional<Double> latitude,
             HttpServletResponse response) {
-        if (cityName.isPresent() && !cityName.get().isEmpty()) {
-            Playlist playlist = playlistReommendation.getPlaylist(cityName.get());
-            return ResponseEntity.status(HttpStatus.OK).body(playlist.toString());
-        } else if (longitude.isPresent() && latitude.isPresent()) {
-            Playlist playlist = playlistReommendation.getPlaylist(longitude.get(), latitude.get());
-            return ResponseEntity.status(HttpStatus.OK).body(playlist.toString());
+
+        try {
+            if (cityName.isPresent() && !cityName.get().isEmpty()) {
+                Playlist playlist = playlistReommendation.getPlaylist(cityName.get());
+                return ResponseEntity.status(HttpStatus.OK).body(playlist.toString());
+            } else if (longitude.isPresent() && latitude.isPresent()) {
+                Playlist playlist = playlistReommendation.getPlaylist(longitude.get(), latitude.get());
+                return ResponseEntity.status(HttpStatus.OK).body(playlist.toString());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

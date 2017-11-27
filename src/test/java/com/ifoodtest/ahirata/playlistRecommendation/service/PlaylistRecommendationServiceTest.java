@@ -25,11 +25,16 @@ public class PlaylistRecommendationServiceTest {
     @Before
     public void setup() {
         playlistRecommendation = new PlaylistRecommendationService(mockWeatherService, mockPlaylistService);
-        mockWeatherService();
+        try {
+            mockWeatherService();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
         mockPlaylistService();
     }
 
-    void mockWeatherService() {
+    void mockWeatherService() throws Exception {
         when(mockWeatherService.getWeather("Belem")).thenReturn(Weather.HOT);
         when(mockWeatherService.getWeather("Campinas")).thenReturn(Weather.WARM);
         when(mockWeatherService.getWeather("Tokyo")).thenReturn(Weather.CHILLY);
@@ -120,7 +125,7 @@ public class PlaylistRecommendationServiceTest {
     }
 
     @Test
-    public void getPartyPlaylistTest() {
+    public void getPartyPlaylistTest() throws Exception {
         Playlist partyPlaylist = createPartyPlaylist();
         assertTrue(arePlaylistsEqual(partyPlaylist, playlistRecommendation.getPlaylist("Belem")));
         assertTrue(arePlaylistsEqual(partyPlaylist, playlistRecommendation.getPlaylist(-48.5, -1.46)));
@@ -131,7 +136,7 @@ public class PlaylistRecommendationServiceTest {
     }
 
     @Test
-    public void getPopPlaylistTest() {
+    public void getPopPlaylistTest() throws Exception {
         Playlist popPlaylist = createPopPlaylist();
         assertTrue(arePlaylistsEqual(popPlaylist, playlistRecommendation.getPlaylist("Campinas")));
         assertTrue(arePlaylistsEqual(popPlaylist, playlistRecommendation.getPlaylist(-47.06, -22.91)));
@@ -142,7 +147,7 @@ public class PlaylistRecommendationServiceTest {
     }
 
     @Test
-    public void getRockPlaylistTest() {
+    public void getRockPlaylistTest() throws Exception {
         Playlist rockPlaylist = createRockPlaylist();
         assertTrue(arePlaylistsEqual(rockPlaylist, playlistRecommendation.getPlaylist("Tokyo")));
         assertTrue(arePlaylistsEqual(rockPlaylist, playlistRecommendation.getPlaylist(139.69, 35.69)));
@@ -153,7 +158,7 @@ public class PlaylistRecommendationServiceTest {
     }
 
     @Test
-    public void getClassicalPlaylistTest() {
+    public void getClassicalPlaylistTest() throws Exception {
         Playlist classicalPlaylist = createClassicalPlaylist();
         assertTrue(arePlaylistsEqual(classicalPlaylist, playlistRecommendation.getPlaylist("London")));
         assertTrue(arePlaylistsEqual(classicalPlaylist, playlistRecommendation.getPlaylist(-0.13, 51.51)));

@@ -14,12 +14,12 @@ public class PlaylistRecommendationService {
         this.playlistService = playlistService;
     }
 
-    public Playlist getPlaylist(String city) {
+    public Playlist getPlaylist(String city) throws Exception {
         Weather weather = weatherService.getWeather(city);
         return getPlaylist(weather);
     }
 
-    public Playlist getPlaylist(Double lon, Double lat) {
+    public Playlist getPlaylist(Double lon, Double lat) throws Exception {
         Weather weather = weatherService.getWeather(lon, lat);
         return getPlaylist(weather);
     }
