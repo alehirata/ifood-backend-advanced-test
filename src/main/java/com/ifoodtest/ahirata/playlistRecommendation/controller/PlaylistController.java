@@ -21,7 +21,7 @@ public class PlaylistController {
     PlaylistRecommendationService playlistReommendation = new PlaylistRecommendationService(new OpenWeatherMapService(),
             new SpotifyService());
 
-    @RequestMapping("/")
+    @RequestMapping("/playlist")
     public ResponseEntity<String> getPlaylist(@RequestParam("city") Optional<String> cityName,
             @RequestParam("lat") Optional<Double> longitude, @RequestParam("long") Optional<Double> latitude,
             HttpServletResponse response) {
@@ -31,11 +31,13 @@ public class PlaylistController {
                 Playlist playlist = playlistReommendation.getPlaylist(cityName.get());
                 return ResponseEntity.status(HttpStatus.OK).body(playlist.toString());
             }
+            // TODO: Verify if the values of latitude and longitude belongs to the interval of existing coordinates
             else if (longitude.isPresent() && latitude.isPresent()) {
                 Playlist playlist = playlistReommendation.getPlaylist(longitude.get(), latitude.get());
                 return ResponseEntity.status(HttpStatus.OK).body(playlist.toString());
             }
         }
+        // TODO: Handle exceptions properly
         catch (Exception ex) {
             ex.printStackTrace();
         }

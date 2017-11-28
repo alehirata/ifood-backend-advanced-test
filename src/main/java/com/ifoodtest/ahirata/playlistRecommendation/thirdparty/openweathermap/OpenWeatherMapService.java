@@ -46,7 +46,8 @@ public class OpenWeatherMapService implements WeatherService {
         }
     }
 
-    public Weather getWeather(String city) throws Exception{
+    // TODO: Possible optimization is to look on a cache of supported cities (http://bulk.openweathermap.org/sample/)
+    public Weather getWeather(String city) throws Exception {
         return requestWeather(getWeatherUrl(city));
     }
 
