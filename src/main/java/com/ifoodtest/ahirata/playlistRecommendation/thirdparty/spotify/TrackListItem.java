@@ -22,7 +22,8 @@ public class TrackListItem {
 
         try {
             jsonStr = mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
+        }
+        catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 

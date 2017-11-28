@@ -3,6 +3,7 @@ package com.ifoodtest.ahirata.playlistRecommendation.thirdparty.spotify;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+// TODO: Change attribute variable names to camel case
 public class TokenResponse {
 
     private String access_token;

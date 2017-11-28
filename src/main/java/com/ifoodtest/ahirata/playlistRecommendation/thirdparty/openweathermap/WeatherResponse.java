@@ -4,14 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WeatherResponse {
+
     private int id;
-    
+
     private String name;
-    
+
     private int cod;
-    
+
     private WeatherCoordinates coord;
-    
+
     private WeatherMain main;
 
     public int getId() {
@@ -53,12 +54,12 @@ public class WeatherResponse {
     public void setMain(WeatherMain main) {
         this.main = main;
     }
-    
+
     @Override
     public String toString() {
         String jsonStr = null;
         ObjectMapper mapper = new ObjectMapper();
-        
+
         try {
             jsonStr = mapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {

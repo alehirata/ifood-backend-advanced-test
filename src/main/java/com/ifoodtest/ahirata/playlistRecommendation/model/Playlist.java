@@ -23,18 +23,14 @@ public class Playlist {
 
     @Override
     public String toString() {
-        /* It could be done using the following code too:
-         * ObjectMapper mapper = new ObjectMapper();
-         * String jsonStr = mapper.writeValueAsString(this);
-         */
-
         StringBuilder sb = new StringBuilder("{\"playlist\": [");
         for (Track track : trackList) {
             sb.append("\"").append(track.toString()).append("\"").append(",");
         }
         if (!trackList.isEmpty()) {
             sb.setCharAt(sb.length() - 1, ']');
-        } else {
+        }
+        else {
             sb.append(']');
         }
         sb.append('}');

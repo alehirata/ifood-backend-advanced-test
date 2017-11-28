@@ -1,6 +1,7 @@
 package com.ifoodtest.ahirata.playlistRecommendation.model;
 
 public class Track {
+
     private String name;
 
     public Track(String name) {
@@ -14,7 +15,7 @@ public class Track {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     @Override
     public String toString() {
         return this.name;

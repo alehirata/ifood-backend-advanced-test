@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WeatherMain {
+
     private double temp;
 
     public double getTemp() {
@@ -13,12 +14,12 @@ public class WeatherMain {
     public void setTemp(double temp) {
         this.temp = temp;
     }
-    
+
     @Override
     public String toString() {
         String jsonStr = null;
         ObjectMapper mapper = new ObjectMapper();
-        
+
         try {
             jsonStr = mapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {

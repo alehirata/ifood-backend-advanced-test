@@ -30,11 +30,13 @@ public class PlaylistController {
             if (cityName.isPresent() && !cityName.get().isEmpty()) {
                 Playlist playlist = playlistReommendation.getPlaylist(cityName.get());
                 return ResponseEntity.status(HttpStatus.OK).body(playlist.toString());
-            } else if (longitude.isPresent() && latitude.isPresent()) {
+            }
+            else if (longitude.isPresent() && latitude.isPresent()) {
                 Playlist playlist = playlistReommendation.getPlaylist(longitude.get(), latitude.get());
                 return ResponseEntity.status(HttpStatus.OK).body(playlist.toString());
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
         }
 

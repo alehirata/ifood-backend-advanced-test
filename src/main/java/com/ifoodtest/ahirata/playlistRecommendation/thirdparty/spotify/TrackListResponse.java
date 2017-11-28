@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TrackListResponse {
+
     private TrackListItem[] items;
 
     public TrackListItem[] getItems() {
@@ -21,7 +22,8 @@ public class TrackListResponse {
 
         try {
             jsonStr = mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
+        }
+        catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 

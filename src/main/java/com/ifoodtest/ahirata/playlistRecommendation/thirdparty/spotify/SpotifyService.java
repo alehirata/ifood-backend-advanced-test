@@ -133,10 +133,7 @@ public class SpotifyService implements PlaylistService {
             HttpEntity<MultiValueMap<String, String>> req = new HttpEntity<>(map, headers);
 
             try {
-                //ResponseEntity<TokenResponse> resp = restTemplate.postForEntity(url, req, TokenResponse.class);
-                //ResponseEntity<String> resp = restTemplate.postForEntity(url, map, String.class);
-                //ResponseEntity<String> resp = restTemplate.postForEntity(url, map, String.class);
-                ResponseEntity<TokenResponse> resp = restTemplate.exchange(url, HttpMethod.POST, req, TokenResponse.class);
+                ResponseEntity<TokenResponse> resp = restTemplate.postForEntity(url, req, TokenResponse.class);
 
                 if (resp.getStatusCode() == HttpStatus.OK) {
                     TokenResponse tokenResponse = resp.getBody();
