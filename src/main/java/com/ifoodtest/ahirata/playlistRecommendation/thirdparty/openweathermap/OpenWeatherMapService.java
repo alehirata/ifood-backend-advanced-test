@@ -77,19 +77,25 @@ public class OpenWeatherMapService implements WeatherService {
         return builder.build().toString();
     }
 
-    Weather requestWeather(String url) throws Exception{
-        ResponseEntity<WeatherResponse> resp = restTemplate.getForEntity(url, WeatherResponse.class);
-        
-        if (resp.getStatusCode() == HttpStatus.OK) {
-            WeatherResponse weatherResponse = resp.getBody();
-            // TODO: Replace stdout for log4j
-            System.out.println("HTTP GET - " + url + " - " + weatherResponse.toString());
-            Double temperature = weatherResponse.getMain().getTemp();
+    Weather requestWeather(String url) throws Exception {
+        try {
+            ResponseEntity<WeatherResponse> resp = restTemplate.getForEntity(url, WeatherResponse.class);
 
-            return Weather.getWeather(temperature);
-        } 
+            if (resp.getStatusCode() == HttpStatus.OK) {
+                WeatherResponse weatherResponse = resp.getBody();
+                // TODO: Replace stdout for log4j
+                System.out.println("HTTP GET - " + url + " - " + weatherResponse.toString());
+                Double temperature = weatherResponse.getMain().getTemp();
 
-        System.err.println("HTTP GET - " + url + " - " + resp.getStatusCode().getReasonPhrase());
-        return Weather.getWeather(null);
+                return Weather.getWeather(temperature);
+            }
+
+            System.err.println("HTTP GET - " + url + " - " + resp.getStatusCode().getReasonPhrase());
+            return Weather.getWeather(null);
+        }
+        catch (Exception ex) {
+            System.err.println("HTTP GET - " + url);
+            throw ex;
+        }
     }
 }

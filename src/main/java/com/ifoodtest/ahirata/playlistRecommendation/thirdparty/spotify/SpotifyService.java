@@ -7,11 +7,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -26,7 +31,9 @@ public class SpotifyService implements PlaylistService {
 
     static final String PROTOCOL = "https";
 
-    static final String BASE_URL = "accounts.spotify.com";
+    static final String REQUEST_TOKEN_BASE_URL = "accounts.spotify.com";
+    
+    static final String API_BASE_URL = "api.spotify.com";
 
     static final String TOKEN_PATH = "/api/token";
 
@@ -38,7 +45,7 @@ public class SpotifyService implements PlaylistService {
 
     static final String TRACKS_PATH = "/tracks";
 
-    static final String AUTHORIZATION_HEADER = "Authorization ";
+    static final String AUTHORIZATION_HEADER = "Authorization";
 
     static final String FIELDS_PARAM = "fields";
 
@@ -65,6 +72,7 @@ public class SpotifyService implements PlaylistService {
             // TODO: Replace it by property file
             String homeDir = System.getProperty("user.home");
             authorization = new String(Files.readAllBytes(Paths.get(homeDir, "keys", "spotify.key"))).trim();
+            restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
 
             genreToUserIdMap = new HashMap<>();
             genreToUserIdMap.put(MusicGenre.PARTY, "spotify");
@@ -83,7 +91,7 @@ public class SpotifyService implements PlaylistService {
         }
     }
 
-    public void refreshTokenIfNeeded() {
+    void refreshTokenIfNeeded() {
         boolean needNewToken = true;
         try {
             rwLock.readLock().lock();
@@ -99,6 +107,13 @@ public class SpotifyService implements PlaylistService {
             requestToken();
         }
     }
+    
+    String getReqTokenAuthHeaderValue(String clientSecretAndclientIdPair) {
+        if (clientSecretAndclientIdPair == null || clientSecretAndclientIdPair.length() == 0 || clientSecretAndclientIdPair.indexOf(':', 0) <= 0) {
+            return "";
+        }
+        return "Basic " + new String(Base64.encodeBase64(clientSecretAndclientIdPair.getBytes()));
+    }
 
     public void requestToken() {
         try {
@@ -110,24 +125,18 @@ public class SpotifyService implements PlaylistService {
                 return;
             }
 
-            UriComponentsBuilder builder = UriComponentsBuilder
-                    .fromPath("/")
-                    .scheme(PROTOCOL)
-                    .host(BASE_URL)
-                    .path(TOKEN_PATH);
-            String url = builder.build().toString();
+            String url = getTokenRequestUrl();
+            HttpHeaders headers = getTokenRequestHeaders();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-            headers.set(AUTHORIZATION_HEADER, "Basic " + authorization);
-
-            TokenRequest tokenRequest = new TokenRequest();
-            tokenRequest.setGrant_type("client_credentials");
-            HttpEntity<TokenRequest> req = new HttpEntity<TokenRequest>(tokenRequest, headers);
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+            map.add("grant_type", "client_credentials");
+            HttpEntity<MultiValueMap<String, String>> req = new HttpEntity<>(map, headers);
 
             try {
-                ResponseEntity<TokenResponse> resp = restTemplate.postForEntity(url, req.toString(),
-                        TokenResponse.class);
+                //ResponseEntity<TokenResponse> resp = restTemplate.postForEntity(url, req, TokenResponse.class);
+                //ResponseEntity<String> resp = restTemplate.postForEntity(url, map, String.class);
+                //ResponseEntity<String> resp = restTemplate.postForEntity(url, map, String.class);
+                ResponseEntity<TokenResponse> resp = restTemplate.exchange(url, HttpMethod.POST, req, TokenResponse.class);
 
                 if (resp.getStatusCode() == HttpStatus.OK) {
                     TokenResponse tokenResponse = resp.getBody();
@@ -137,12 +146,11 @@ public class SpotifyService implements PlaylistService {
                     // TODO: set expiration time
                     return;
                 }
-            } 
-            catch (Exception ex) {
-                System.err.println("HTTP POST - " + url);    
             }
-
-            
+            catch (Exception ex) {
+                System.err.println("HTTP POST - " + url);
+                throw ex;
+            }
         }
         finally {
             if (rwLock.isWriteLocked()) {
@@ -151,27 +159,59 @@ public class SpotifyService implements PlaylistService {
         }
     }
 
-    String getPlaylistUrl(MusicGenre genre) {
-        String userId = genreToUserIdMap.get(genre);
-        String playlistId = genreToPlaylistIdMap.get(genre);
+    String getTokenRequestUrl() {
         UriComponentsBuilder builder = UriComponentsBuilder
                 .fromPath("/")
                 .scheme(PROTOCOL)
-                .host(BASE_URL)
+                .host(REQUEST_TOKEN_BASE_URL)
+                .path(TOKEN_PATH);
+        String url = builder.build().toString();
+
+        return url;
+    }
+
+    HttpHeaders getTokenRequestHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.ALL));
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set(AUTHORIZATION_HEADER, getReqTokenAuthHeaderValue(authorization));
+
+        return headers;
+    }
+    
+    HttpHeaders getApiRequestHeaders(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.set(AUTHORIZATION_HEADER, "Bearer " + token);
+
+        return headers;
+    }
+
+    String getPlaylistUrl(MusicGenre genre) {
+        String userId = genreToUserIdMap.get(genre);
+        String playlistId = genreToPlaylistIdMap.get(genre);
+        return getPlaylistUrl(userId, playlistId);
+    }
+
+    String getPlaylistUrl(String userId, String playlistId) {
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromPath("/")
+                .scheme(PROTOCOL)
+                .host(API_BASE_URL)
                 .path(VERSION_PATH)
                 .path(USERS_PATH)
-                .path(userId)
+                .path('/' + userId)
                 .path(PLAYLISTS_PATH)
-                .path(playlistId)
+                .path('/' + playlistId)
                 .path(TRACKS_PATH)
                 .queryParam(FIELDS_PARAM, FIELDS_DEFAULT_VALUE)
                 .queryParam(LIMIT_PARAM, LIMIT_DEFAULT_VALUE);
+
         return builder.build().toString();
     }
 
     public Playlist getPlaylist(MusicGenre genre) {
         refreshTokenIfNeeded();
-        
         String tokenStr;
         try {
             rwLock.readLock().lock();
@@ -180,29 +220,32 @@ public class SpotifyService implements PlaylistService {
         finally {
             rwLock.readLock().unlock();
         }
-
         String url = getPlaylistUrl(genre);
 
         return requestPlaylist(url, tokenStr);
-        
     }
-    
+
     Playlist requestPlaylist(String url, String tokenStr) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.set(AUTHORIZATION_HEADER, "Bearer " + tokenStr);
+        try {
+            HttpHeaders headers = getApiRequestHeaders(tokenStr);
+            HttpEntity<String> req = new HttpEntity<String>("", headers);
+            ResponseEntity<TrackListResponse> resp = restTemplate.exchange(url, HttpMethod.GET, req,
+                    TrackListResponse.class);
 
-        ResponseEntity<TrackListResponse> resp = restTemplate.getForEntity(url, TrackListResponse.class);
+            if (resp.getStatusCode() == HttpStatus.OK) {
+                TrackListResponse trackListResponse = resp.getBody();
+                // TODO: Replace stdout for log4j
+                System.out.println("HTTP GET - " + url + " - " + trackListResponse.toString());
 
-        if (resp.getStatusCode() == HttpStatus.OK) {
-            TrackListResponse trackListResponse = resp.getBody();
-            // TODO: Replace stdout for log4j
-            System.out.println("HTTP GET - " + url + " - " + trackListResponse.toString());
-            
-            return buildPlaylist(trackListResponse.getItems());
+                return buildPlaylist(trackListResponse.getItems());
+            }
+
+            return new Playlist();
         }
-
-        return new Playlist();
+        catch (Exception ex) {
+            System.err.println("HTTP GET - " + url);
+            throw ex;
+        }
     }
 
     Playlist buildPlaylist(TrackListItem[] items) {
@@ -214,7 +257,7 @@ public class SpotifyService implements PlaylistService {
         for (TrackListItem i : items) {
             playlist.addTrack(new Track(i.getTrack().getName()));
         }
-        
+
         return playlist;
     }
 }

@@ -5,6 +5,7 @@ import com.ifoodtest.ahirata.playlistRecommendation.model.Playlist;
 import com.ifoodtest.ahirata.playlistRecommendation.model.Weather;
 
 public class PlaylistRecommendationService {
+
     private WeatherService weatherService;
 
     private PlaylistService playlistService;
@@ -42,6 +43,9 @@ public class PlaylistRecommendationService {
 
         case FREEZING:
             return MusicGenre.CLASSICAL;
+
+        default:
+            break;
         }
 
         return null;
